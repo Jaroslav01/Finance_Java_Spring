@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface FinanceRecordRepository extends JpaRepository<FinanceRecord, Long> {
 
-    List<FinanceRecord> findAllByUserIdDesc(Long userId);
+    //List<FinanceRecord> findAllByUserIdDesc(Long id);
 
     Optional<FinanceRecord> findFinanceRecordById(Long id);
 }
