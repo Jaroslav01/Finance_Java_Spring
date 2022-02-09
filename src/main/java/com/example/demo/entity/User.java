@@ -2,6 +2,7 @@ package com.example.demo.entity;
 
 import com.example.demo.entity.enums.ERole;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,6 +38,8 @@ public class User implements UserDetails {
     )
     private Set<ERole> role = new HashSet<>();
 
+    //@Transient
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     private List<FinanceRecord> financerecord = new ArrayList<>();
 

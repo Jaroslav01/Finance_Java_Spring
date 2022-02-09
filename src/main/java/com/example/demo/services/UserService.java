@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.dto.UserDTO;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.ERole;
 import com.example.demo.exceptions.UserExistException;
@@ -8,8 +9,11 @@ import com.example.demo.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.security.Principal;
 
 @Service
 public class UserService {
@@ -22,6 +26,12 @@ public class UserService {
     public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    private User getUserByPrincipal(Principal principal){
+        var username = principal.getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found with username " + username));
     }
 
     public User createUser(SignupRequest userIn){
@@ -41,5 +51,15 @@ public class UserService {
             LOG.error("Error during registration. {}", ex.getMessage());
             throw new UserExistException("The user " + user.getUsername() + " already exist. Please check credentionals");
         }
+    }
+
+    public User updateUser(UserDTO userDTO, Principal principal){
+        var user = getUserByPrincipal(principal);
+
+        user.setFirstname(userDTO.getFirstname());
+        user.setMiddlename(userDTO.getMiddlename());
+        user.setLastname(user.getLastname());
+
+        return userRepository.save(user);
     }
 }
