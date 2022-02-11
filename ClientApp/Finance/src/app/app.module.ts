@@ -13,7 +13,13 @@ import { LoginComponent } from './auth/login/login.component';
 
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
+import { NgApexchartsModule } from "ng-apexcharts";
+import {ReactiveFormsModule} from "@angular/forms";
+import { UserSettingsComponent } from './user/user-settings/user-settings.component';
+import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
+import {TokenInterceptor} from "./auth/token.interceptor";
 @NgModule({
   declarations: [
     AppComponent,
@@ -22,16 +28,27 @@ import { MatDialogModule } from '@angular/material/dialog';
     PageNotFoundComponent,
     FooterComponent,
     AboutComponent,
-    LoginComponent
+    LoginComponent,
+    UserSettingsComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatTabsModule,
-    MatDialogModule
+    MatDialogModule,
+    NgApexchartsModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    MatSnackBarModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

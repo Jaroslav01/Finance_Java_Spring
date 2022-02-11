@@ -2,21 +2,22 @@
   <div class="row">
     <div class="col-sm-5 mt-4">
       <div class="card rounded-lg shadow-sm">
+        <div class="card-header bg-dark text-light">
+          <span class="h5">Login</span>
+        </div>
         <div class="card-body">
-          <h5 class="card-title text-center">Login</h5>
-          <hr>
-          <form action="" class="mt-2">
+          <form action="" class="mt-2" [formGroup]="loginForm" (ngSubmit)="login()">
             <div class="form-floating mb-3">
-              <input type="email" class="form-control" placeholder="name@example.com">
+              <input type="email" class="form-control" placeholder="name@example.com" formControlName="username">
               <label>Email address</label>
             </div>
             <div class="form-floating">
-              <input type="password" class="form-control" placeholder="Password">
+              <input type="password" class="form-control" placeholder="Password" formControlName="password">
               <label>Password</label>
             </div>
             <hr>
             <div class="d-grid gap-2 mx-auto mt-2">
-              <button class="btn btn-dark" type="button">Login</button>
+              <button class="btn btn-dark" type="sumbit" [disabled]="loginForm.invalid">Login</button>
             </div>
           </form>
         </div>
@@ -24,38 +25,38 @@
     </div>
     <div class="col-sm-7 mt-4">
       <div class="card rounded-lg shadow-sm">
+        <div class="card-header bg-dark text-light">
+          <span class="h5">SignUp</span>
+        </div>
         <div class="card-body">
-          <h5 class="card-title text-center">SignUp</h5>
-          <hr>
-          <form action="" class="mt-2">
+          <form action="" class="mt-2" [formGroup]="signUpForm" (ngSubmit)="signUp()">
             <div class="form-floating mb-3">
-              <input type="text" class="form-control" placeholder="Firstname">
+              <input type="text" class="form-control" placeholder="Firstname" formControlName="firstname">
               <label>Firstname</label>
             </div>
             <div class="form-floating mb-3">
-              <input type="text" class="form-control" placeholder="Middlename">
+              <input type="text" class="form-control" placeholder="Middlename" formControlName="middlename">
               <label>Middlename</label>
             </div>
             <div class="form-floating mb-3">
-              <input type="text" class="form-control" placeholder="Lastname">
+              <input type="text" class="form-control" placeholder="Lastname" formControlName="lastname">
               <label>Lastname</label>
             </div>
-
             <div class="form-floating mb-3">
-              <input type="email" class="form-control" placeholder="Email">
+              <input type="email" class="form-control" placeholder="Email" formControlName="email">
               <label>Email</label>
             </div>
             <div class="form-floating mb-3">
-              <input type="password" class="form-control" placeholder="Password">
+              <input type="password" class="form-control" placeholder="Password" formControlName="password">
               <label>Password</label>
             </div>
             <div class="form-floating mb-3">
-              <input type="password" class="form-control" placeholder="Confirm Password">
+              <input type="password" class="form-control" placeholder="Confirm Password" formControlName="confirmPassword">
               <label>Confirm Password</label>
             </div>
             <hr>
             <div class="d-grid gap-2 mx-auto mt-2">
-              <button class="btn btn-dark" type="button">SignUp</button>
+              <button class="btn btn-dark" type="submit" [disabled]="signUpForm.invalid">SignUp</button>
             </div>
           </form>
         </div>
