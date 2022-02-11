@@ -34,6 +34,9 @@ public class UserService {
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found with username " + username));
     }
 
+    public User getUser(Principal principal){
+        return getUserByPrincipal(principal);
+    }
     public User createUser(SignupRequest userIn){
         User user = new User();
         user.setEmail(userIn.getEmail());

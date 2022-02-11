@@ -7,7 +7,7 @@ import {
   HttpErrorResponse
 } from '@angular/common/http';
 import { Observable } from 'rxjs/internal/Observable';
-import { throwError } from 'rxjs';
+import {map, throwError} from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -18,6 +18,7 @@ export class TokenInterceptor implements HttpInterceptor {
   constructor(private router: Router, private _snackBar: MatSnackBar, private app: AppService) { }
   public intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
       console.log(localStorage.getItem("access_token"));
+    this.app.isQuery = true;
     request = request.clone({
       setHeaders: {
         Authorization: `${localStorage.getItem("access_token")}`
@@ -36,6 +37,7 @@ export class TokenInterceptor implements HttpInterceptor {
         else if (response.status == 400) {
           this.openSnackBar(response.error)
         }
+        this.app.isQuery = false;
         return throwError(response);
       }
     ));

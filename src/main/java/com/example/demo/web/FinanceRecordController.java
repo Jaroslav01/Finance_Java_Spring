@@ -35,12 +35,14 @@ public class FinanceRecordController {
     public ResponseEntity<Object> registerUser(@Valid @RequestBody CreateFinanceRecordRequest createFinanceRecordRequest, BindingResult bindingResult, Principal principal){
         var errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) return errors;
+
         financeRecordService.createFinanceRecord(createFinanceRecordRequest, principal);
         return ResponseEntity.ok(new CreateFinanceRecordSuccessResponse(true));
     }
 
     @GetMapping("/getAllByUser")
     public ResponseEntity<Object> getAllFinanceRecordsByUser(Principal principal){
+
         return ResponseEntity.ok(financeRecordService.getAllFinanceRecordsByUser(principal));
     }
 

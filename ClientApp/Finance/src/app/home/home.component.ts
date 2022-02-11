@@ -15,6 +15,7 @@ import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpClient, HttpEvent} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {FinanceRecord} from "../web-api";
+import {AppService} from "../app.service";
 
 @Component({
   selector: 'app-home',
@@ -40,24 +41,19 @@ export class HomeComponent implements OnInit {
       ])
     });
 
-    this.http.get<FinanceRecord[]>(environment.apiUrl + '/api/FinanceRecord/getAllByUser', this.addRecordForm.value).subscribe(response =>{
-      console.log(response)
-      // @ts-ignore
-      this.financeRecords = response;
-      // this.financeRecords = response;
-      this.initChartData();
-
-    })
+    this.getFinanceRecords();
   }
 
   public monthlyPlanForm!: FormGroup;
   public addRecordForm!: FormGroup;
 
-  public series!: any;
+  public seriesconsumption!: any;
+  public seriesIncome!: any;
   public chart!: ApexChart;
   public dataLabels!: ApexDataLabels;
   public markers!: ApexMarkers;
   public title!: ApexTitleSubtitle;
+  public titleIncome!: ApexTitleSubtitle;
   public fill!: ApexFill;
   public yaxis!: ApexYAxis;
   public xaxis!: ApexXAxis;
@@ -65,12 +61,16 @@ export class HomeComponent implements OnInit {
 
   public lastUpdatedTime: number = Date.now();
 
+  public summIncome: number = 0;
+  public summconsumption: number = 0;
+
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private app: AppService
   ) {
   }
 
-  public initChartData(): void {
+  private inicializeIncome(){
     let ts2 = 1484418600000;
     let dates: (number | Date | undefined)[][] = [];
     let d1 = new Date();
@@ -78,8 +78,12 @@ export class HomeComponent implements OnInit {
     this.financeRecords.forEach(financeRecord => {
       console.log(financeRecord.amount);
       console.log(financeRecord.createdDate);
-      ts2 = ts2 + 86400000;
-      if(financeRecord.createdDate) dates.push([ts2, financeRecord.amount]);
+      if (financeRecord.createdDate)
+        console.log(new Date(financeRecord.createdDate));
+      if (financeRecord.type == 0){
+        ts2 = ts2 + 86400000;
+        if(financeRecord.createdDate) dates.push([ts2, financeRecord.amount]);
+      }
     })
 
     // for (let i = 0; i < 120; i++) {
@@ -87,12 +91,50 @@ export class HomeComponent implements OnInit {
     //   dates.push([ts2, dataSeries[1][i].value]);
     // }
 
-    this.series = [
+    this.seriesIncome = [
       {
-        name: "Money",
+        name: "USD",
         data: dates
       }
     ];
+
+    this.titleIncome = {
+      text: "Income chart",
+      align: "left"
+    };
+  }
+
+  public initChartData(): void {
+
+    this.inicializeIncome();
+
+    let ts2 = 1484418600000;
+    let dates: (number | Date | undefined)[][] = [];
+    let d1 = new Date();
+
+    this.financeRecords.forEach(financeRecord => {
+      console.log(financeRecord.amount);
+      console.log(financeRecord.createdDate);
+      if (financeRecord.createdDate)
+      console.log(new Date(financeRecord.createdDate));
+      if (financeRecord.type == 1){
+        ts2 = ts2 + 86400000;
+        if(financeRecord.createdDate) dates.push([ts2, financeRecord.amount]);
+      }
+    })
+
+    // for (let i = 0; i < 120; i++) {
+    //   ts2 = ts2 + 86400000;
+    //   dates.push([ts2, dataSeries[1][i].value]);
+    // }
+
+    this.seriesconsumption = [
+      {
+        name: "USD",
+        data: dates
+      }
+    ];
+
     this.chart = {
       type: "area",
       stacked: false,
@@ -113,7 +155,7 @@ export class HomeComponent implements OnInit {
       size: 0
     };
     this.title = {
-      text: "Stock Price Movement",
+      text: "Сonsumption chart",
       align: "left"
     };
     this.fill = {
@@ -151,11 +193,42 @@ export class HomeComponent implements OnInit {
 
   addRecord() {
     this.http.post<any>(environment.apiUrl + '/api/FinanceRecord/create', this.addRecordForm.value).subscribe(response =>{
-
+      this.app.isQuery = false;
+      this.getFinanceRecords();
     })
   }
 
   updateMonthlyPlanForm() {
 
+  }
+
+  private processIncomeAndСonsumption() {
+    let summIncome = 0;
+    let summconsumption = 0;
+    this.financeRecords.forEach(financeRecord =>{
+      if (financeRecord.amount){
+        if (financeRecord.type == 0){
+          summIncome += financeRecord.amount;
+        }
+        else if (financeRecord.type == 1){
+          summconsumption += financeRecord.amount;
+        }
+      }
+    });
+    this.summIncome = summIncome;
+    this.summconsumption = summconsumption;
+  }
+
+  public getFinanceRecords(){
+    this.http.get<FinanceRecord[]>(environment.apiUrl + '/api/FinanceRecord/getAllByUser').subscribe(response =>{
+      console.log(response)
+      // @ts-ignore
+      this.financeRecords = response;
+      // this.financeRecords = response;
+      this.initChartData();
+      this.processIncomeAndСonsumption();
+      this.app.isQuery = false;
+      this.lastUpdatedTime = Date.now();
+    })
   }
 }

@@ -1,23 +1,36 @@
+<div class="card shadow-sm mt-4">
+  <div class="card-header bg-dark text-light h5">
+    Access JWT token
+  </div>
+  <div class="card-body">
+    {{accessToken}}
+  </div>
+</div>
+
 <div class="row">
   <div class="col-sm-6 mt-4">
     <div class="card">
       <div class="card-body">
-        <form action="" class="mt-2">
-          <div class="form-floating mb-3">
-            <input type="text" class="form-control" placeholder="Firstname">
+        <form action="" class="mt-2" [formGroup]="userDataForm">
+          <div class="form-floating mb-3" style="display: none">
+            <input type="text" class="form-control" placeholder="Firstname" formControlName="firstname">
             <label>Firstname</label>
           </div>
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" placeholder="Middlename">
+            <input type="text" class="form-control" placeholder="Firstname" formControlName="firstname">
+            <label>Firstname</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="text" class="form-control" placeholder="Middlename" formControlName="middlename">
             <label>Middlename</label>
           </div>
           <div class="form-floating mb-3">
-            <input type="text" class="form-control" placeholder="Lastname">
+            <input type="text" class="form-control" placeholder="Lastname" formControlName="lastname">
             <label>Lastname</label>
           </div>
           <hr>
           <div class="d-grid gap-2 mx-auto mt-2">
-            <button class="btn btn-dark" type="button">Submit</button>
+            <button class="btn btn-dark" type="submit">Submit</button>
           </div>
         </form>
       </div>

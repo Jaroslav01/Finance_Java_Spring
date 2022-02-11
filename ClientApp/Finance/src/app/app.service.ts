@@ -9,7 +9,7 @@ export class AppService {
     this.updateAUthorizedStatus();
   }
   isAuthorized = false;
-
+  isQuery = false;
   // public navBarChange = new BehaviorSubject<boolean> (false);
   updateAUthorizedStatus(){
     this.isAuthorized = localStorage.getItem("access_token") != null;

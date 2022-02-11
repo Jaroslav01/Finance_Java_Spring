@@ -1,4 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import {HttpClient} from "@angular/common/http";
+import {environment} from "../../../environments/environment";
+import {User} from "../../models/user.model";
+import {AppService} from "../../app.service";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-user-settings',
@@ -7,9 +12,36 @@ import { Component, OnInit } from '@angular/core';
 })
 export class UserSettingsComponent implements OnInit {
 
-  constructor() { }
+  constructor(
+    private app: AppService,
+    private http: HttpClient
+  ) { }
 
-  ngOnInit(): void {
+  public user!: User;
+  public accessToken = "";
+
+  public userDataForm!: FormGroup;
+
+  async ngOnInit() {
+    let accessToken = localStorage.getItem("access_token");
+    if (accessToken) this.accessToken = accessToken;
+    await this.http.get<User>(environment.apiUrl + '/api/user/getCurrentUser').subscribe(response => {
+      console.log(response)
+      this.user = response;
+      this.userDataForm = new FormGroup({
+        firstname: new FormControl(this.user.firstname, [
+          Validators.required
+        ]),
+        middlename: new FormControl(this.user.middlename, [
+          Validators.required
+        ]),
+        lastname: new FormControl(this.user.lastname, [
+          Validators.required
+        ]),
+      });
+      this.app.isQuery = false;
+    });
+
   }
 
 }
