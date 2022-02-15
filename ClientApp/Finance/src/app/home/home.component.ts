@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -20,7 +20,8 @@ import {AppService} from "../app.service";
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  styleUrls: ['./home.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit {
   private financeRecords: FinanceRecord[] = [];
@@ -35,6 +36,7 @@ export class HomeComponent implements OnInit {
     this.addRecordForm = new FormGroup({
       amount: new FormControl("", [
         Validators.required,
+        Validators.min(0)
       ]),
       type: new FormControl(1, [
         Validators.required
@@ -64,9 +66,11 @@ export class HomeComponent implements OnInit {
   public summIncome: number = 0;
   public summconsumption: number = 0;
 
+  private now!: Date;
+
   constructor(
     private http: HttpClient,
-    private app: AppService
+    public app: AppService
   ) {
   }
 
@@ -78,8 +82,8 @@ export class HomeComponent implements OnInit {
     this.financeRecords.forEach(financeRecord => {
       console.log(financeRecord.amount);
       console.log(financeRecord.createdDate);
-      if (financeRecord.createdDate)
-        console.log(new Date(financeRecord.createdDate));
+      //if (financeRecord.createdDate)
+        // console.log(new Date(financeRecord.createdDate));
       if (financeRecord.type == 0){
         ts2 = ts2 + 86400000;
         if(financeRecord.createdDate) dates.push([ts2, financeRecord.amount]);

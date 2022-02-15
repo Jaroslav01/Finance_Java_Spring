@@ -8,6 +8,7 @@ export class AppService {
   constructor() {
     this.updateAUthorizedStatus();
   }
+  username = "John Doe"
   isAuthorized = false;
   isQuery = false;
   // public navBarChange = new BehaviorSubject<boolean> (false);

@@ -2,7 +2,7 @@
   <div class="col-sm-3 mt-4">
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-light h5">
-        Monthly plan
+        Spending monthly plan <mat-icon>calendar_month</mat-icon>
       </div>
       <div class="card-body">
         <span class="h2">Example</span>
@@ -13,7 +13,7 @@
   <div class="col-sm-3 mt-4">
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-light h5">
-        Income
+        Income <mat-icon style="color: greenyellow">trending_up</mat-icon>
       </div>
       <div class="card-body">
         <span class="h2">{{summIncome | currency}}</span>
@@ -24,7 +24,7 @@
   <div class="col-sm-3 mt-4">
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-light h5">
-        Сonsumption
+        Сonsumption <mat-icon style="color: red">trending_down</mat-icon>
       </div>
       <div class="card-body">
         <span class="h2">{{summconsumption | currency}}</span>
@@ -35,7 +35,7 @@
   <div class="col-sm-3 mt-4">
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-light h5">
-        Difference
+        Difference <mat-icon>account_balance_wallet</mat-icon>
       </div>
       <div class="card-body">
         <span class="h2">{{summIncome - summconsumption | currency}}</span>
@@ -45,10 +45,10 @@
 </div>
 
 <div class="row">
-  <div class="col-sm-6 mt-4">
+  <div class="col-sm-4 mt-4">
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-light h5">
-        Change monthly plan
+        Spending change monthly plan <mat-icon>price_change</mat-icon>
       </div>
       <div class="card-body">
         <form action="" [formGroup]="monthlyPlanForm" (ngSubmit)="updateMonthlyPlanForm()">
@@ -60,10 +60,10 @@
     </div>
   </div>
 
-  <div class="col-sm-6 mt-4">
+  <div class="col-sm-8 mt-4">
     <div class="card shadow-sm">
       <div class="card-header bg-dark text-light h5">
-        Add finance record
+        Add finance record <mat-icon>request_quote</mat-icon>
       </div>
       <div class="card-body">
         <form action="" class="row g-2" [formGroup]="addRecordForm" (ngSubmit)="addRecord()">
@@ -89,11 +89,13 @@
 
 <div class="card mt-4 shadow-sm">
   <div class="card-header bg-dark text-light h5">
-    {{title.text}}
+    {{title.text}} <mat-icon>ssid_chart</mat-icon>
   </div>
   <div class="card-body">
     <div class="flex flex-col flex-auto h-80">
+      <div class="load-chart" *ngIf="app.isQuery">Loading...</div>
       <apx-chart
+        *ngIf="!app.isQuery"
         [series]="seriesconsumption"
         [chart]="chart"
         [dataLabels]="dataLabels"
@@ -130,10 +132,11 @@
 
 <div class="card mt-4 shadow-sm">
   <div class="card-header bg-dark text-light h5">
-    {{titleIncome.text}}
+    {{titleIncome.text}} <mat-icon>ssid_chart</mat-icon>
   </div>
   <div class="card-body">
     <div class="flex flex-col flex-auto h-80">
+      <div class="load-chart" *ngIf="app.isQuery">Loading...</div>
       <apx-chart
         [series]="seriesIncome"
         [chart]="chart"

@@ -35,7 +35,8 @@ export class TokenInterceptor implements HttpInterceptor {
             window.location.href = "/login";
         }
         else if (response.status == 400) {
-          this.openSnackBar(response.error)
+
+          this.openSnackBar(JSON.stringify(response.error))
         }
         this.app.isQuery = false;
         return throwError(response);

@@ -15,6 +15,7 @@ export class LoginComponent implements OnInit {
 
   loginForm!: FormGroup;
   signUpForm!: FormGroup;
+  restoreForm!: FormGroup;
 
   constructor(
     private myValidatorsService: MyValidatorsService,
@@ -57,6 +58,14 @@ export class LoginComponent implements OnInit {
         Validators.minLength(8)
       ]),
     });
+
+    this.restoreForm = new FormGroup({
+      username: new FormControl("", [
+        Validators.required,
+        Validators.email
+
+      ]),
+    });
   }
 
   ngOnInit(): void {
@@ -81,5 +90,9 @@ export class LoginComponent implements OnInit {
       this.loginForm.get("password")?.setValue(this.signUpForm.get("password")?.value);
       this.login();
     });
+  }
+
+  restore() {
+
   }
 }

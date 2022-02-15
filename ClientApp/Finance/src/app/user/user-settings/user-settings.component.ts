@@ -38,10 +38,20 @@ export class UserSettingsComponent implements OnInit {
         lastname: new FormControl(this.user.lastname, [
           Validators.required
         ]),
+        email: new FormControl(this.user.email, [
+          Validators.required,
+          Validators.email
+        ]),
       });
       this.app.isQuery = false;
     });
 
   }
 
+  updateUser() {
+    this.http.post<User>(environment.apiUrl + '/api/user/updateUserData', this.userDataForm.value).subscribe(response =>{
+      this.user = response;
+      this.app.isQuery = false;
+    });
+  }
 }
