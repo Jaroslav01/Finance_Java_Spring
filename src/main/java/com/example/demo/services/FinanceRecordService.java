@@ -13,7 +13,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class FinanceRecordService {
@@ -38,6 +41,10 @@ public class FinanceRecordService {
     public FinanceRecord createFinanceRecord(CreateFinanceRecordRequest createFinanceRecordRequest, Principal principal){
         var user = getUserByPrincipal(principal);
 
+        return this.createFinanceRecord(createFinanceRecordRequest, user);
+    }
+
+    public FinanceRecord createFinanceRecord(CreateFinanceRecordRequest createFinanceRecordRequest, User user){
         var financeRecord = new FinanceRecord();
         financeRecord.setAmount(createFinanceRecordRequest.getAmount());
         financeRecord.setType(createFinanceRecordRequest.getType());
@@ -50,5 +57,26 @@ public class FinanceRecordService {
     public List<FinanceRecord> getAllFinanceRecordsByUser(Principal principal){
         var user = getUserByPrincipal(principal);
         return financeRecordRepository.findAllByUser(user);
+    }
+
+    public List<FinanceRecord> getAllFinanceRecordsByUserLastMonth(Principal principal){
+        var user = getUserByPrincipal(principal);
+        var financeRecords = financeRecordRepository.findAllByUser(user);
+        var financeRecordLastMonth = financeRecords.stream().filter((financeRecord) ->
+                this.checkDate(financeRecord.getCreatedDate())
+        ).collect(Collectors.toList());
+        return financeRecordLastMonth;
+    }
+
+    private boolean checkDate(long time){
+        Date date = new Date(time);
+        Date dateFor2 = new Date();
+        Date date2 = new Date(dateFor2.getYear(), dateFor2.getMonth(), 1);
+
+        System.out.println(date);
+        System.out.println(date2);
+
+        if (date.compareTo(date2) > 0) return true;
+        else return false;
     }
 }

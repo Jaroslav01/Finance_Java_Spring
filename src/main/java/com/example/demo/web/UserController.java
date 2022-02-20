@@ -5,6 +5,7 @@ import java.security.Principal;
 import com.example.demo.dto.UserDTO;
 import com.example.demo.payload.request.SignupRequest;
 import com.example.demo.services.FinanceRecordService;
+import com.example.demo.services.MailgunService;
 import com.example.demo.services.UserService;
 import com.example.demo.validations.ResponseErrorValidation;
 

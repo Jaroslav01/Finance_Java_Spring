@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {
   ApexAxisChartSeries,
   ApexChart,
@@ -14,8 +14,9 @@ import {dataSeries} from "./data-series";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {HttpClient, HttpEvent} from "@angular/common/http";
 import {environment} from "../../environments/environment";
-import {FinanceRecord} from "../web-api";
 import {AppService} from "../app.service";
+import {FinanceMonthPlan} from "../models/financeMonthPlan.model";
+import {FinanceRecord} from "../models/financeRecord.model";
 
 @Component({
   selector: 'app-home',
@@ -28,7 +29,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.monthlyPlanForm = new FormGroup({
-      amount: new FormControl(100, [
+      amount: new FormControl(0, [
         Validators.required,
       ]),
     });
@@ -42,7 +43,7 @@ export class HomeComponent implements OnInit {
         Validators.required
       ])
     });
-
+    this.getMonthPlan();
     this.getFinanceRecords();
   }
 
@@ -66,34 +67,26 @@ export class HomeComponent implements OnInit {
   public summIncome: number = 0;
   public summconsumption: number = 0;
 
+  public monthPlan!: FinanceMonthPlan[];
+
   private now!: Date;
 
   constructor(
     private http: HttpClient,
-    public app: AppService
+    public app: AppService,
+    private ref: ChangeDetectorRef
   ) {
   }
 
   private inicializeIncome(){
-    let ts2 = 1484418600000;
     let dates: (number | Date | undefined)[][] = [];
-    let d1 = new Date();
-
-    this.financeRecords.forEach(financeRecord => {
-      console.log(financeRecord.amount);
-      console.log(financeRecord.createdDate);
-      //if (financeRecord.createdDate)
-        // console.log(new Date(financeRecord.createdDate));
-      if (financeRecord.type == 0){
-        ts2 = ts2 + 86400000;
-        if(financeRecord.createdDate) dates.push([ts2, financeRecord.amount]);
-      }
-    })
-
-    // for (let i = 0; i < 120; i++) {
-    //   ts2 = ts2 + 86400000;
-    //   dates.push([ts2, dataSeries[1][i].value]);
-    // }
+    if (this.financeRecords && this.financeRecords.length != 0){
+      this.financeRecords.forEach(financeRecord => {
+        if (financeRecord.type == 0){
+          dates.push([financeRecord.createdDate, financeRecord.amount]);
+        }
+      })
+    }
 
     this.seriesIncome = [
       {
@@ -111,26 +104,16 @@ export class HomeComponent implements OnInit {
   public initChartData(): void {
 
     this.inicializeIncome();
-
-    let ts2 = 1484418600000;
     let dates: (number | Date | undefined)[][] = [];
-    let d1 = new Date();
 
     this.financeRecords.forEach(financeRecord => {
-      console.log(financeRecord.amount);
-      console.log(financeRecord.createdDate);
-      if (financeRecord.createdDate)
-      console.log(new Date(financeRecord.createdDate));
-      if (financeRecord.type == 1){
-        ts2 = ts2 + 86400000;
-        if(financeRecord.createdDate) dates.push([ts2, financeRecord.amount]);
+      if (this.financeRecords && this.financeRecords.length != 0){
+        if (financeRecord.type == 1){
+          dates.push([financeRecord.createdDate, financeRecord.amount]);
+        }
       }
+      this.ref.detectChanges();
     })
-
-    // for (let i = 0; i < 120; i++) {
-    //   ts2 = ts2 + 86400000;
-    //   dates.push([ts2, dataSeries[1][i].value]);
-    // }
 
     this.seriesconsumption = [
       {
@@ -152,16 +135,20 @@ export class HomeComponent implements OnInit {
         autoSelected: "zoom"
       }
     };
+
     this.dataLabels = {
       enabled: false
     };
+
     this.markers = {
       size: 0
     };
+
     this.title = {
       text: "Сonsumption chart",
       align: "left"
     };
+
     this.fill = {
       type: "gradient",
       gradient: {
@@ -172,6 +159,7 @@ export class HomeComponent implements OnInit {
         stops: [0, 90, 100]
       }
     };
+
     this.yaxis = {
       labels: {
         formatter: function(val) {
@@ -182,9 +170,14 @@ export class HomeComponent implements OnInit {
         text: "Money"
       }
     };
+
     this.xaxis = {
+      title: {
+        text: "Time"
+      },
       type: "datetime"
     };
+
     this.tooltip = {
       shared: false,
       y: {
@@ -197,13 +190,9 @@ export class HomeComponent implements OnInit {
 
   addRecord() {
     this.http.post<any>(environment.apiUrl + '/api/FinanceRecord/create', this.addRecordForm.value).subscribe(response =>{
-      this.app.isQuery = false;
       this.getFinanceRecords();
+      this.app.isQuery = false;
     })
-  }
-
-  updateMonthlyPlanForm() {
-
   }
 
   private processIncomeAndСonsumption() {
@@ -221,18 +210,40 @@ export class HomeComponent implements OnInit {
     });
     this.summIncome = summIncome;
     this.summconsumption = summconsumption;
+    this.ref.detectChanges();
   }
 
   public getFinanceRecords(){
     this.http.get<FinanceRecord[]>(environment.apiUrl + '/api/FinanceRecord/getAllByUser').subscribe(response =>{
-      console.log(response)
+      console.log("FinanceRecords: ", response);
+
       // @ts-ignore
       this.financeRecords = response;
-      // this.financeRecords = response;
       this.initChartData();
       this.processIncomeAndСonsumption();
-      this.app.isQuery = false;
+      this.ref.detectChanges();
       this.lastUpdatedTime = Date.now();
+      this.app.isQuery = false;
+
     })
+  }
+
+  public createMonthPlan(){
+    this.http.post<FinanceMonthPlan[]>(environment.apiUrl + '/api/FinanceMonthPlan/create', this.monthlyPlanForm.value).subscribe(response => {
+      console.log(response);
+      this.monthPlan = response;
+      // this.monthlyPlanForm.controls['amount'].setValue(response[response.length - 1].amount);
+      this.ref.detectChanges();
+      this.app.isQuery = false;
+    });
+  }
+
+  public getMonthPlan(){
+    this.http.get<FinanceMonthPlan[]>(environment.apiUrl + '/api/FinanceMonthPlan/getAllByUser').subscribe(response => {
+      this.monthPlan = response;
+      // this.monthlyPlanForm.controls['amount'].setValue(response[response.length - 1].amount);
+      this.ref.detectChanges();
+      this.app.isQuery = false;
+    });
   }
 }

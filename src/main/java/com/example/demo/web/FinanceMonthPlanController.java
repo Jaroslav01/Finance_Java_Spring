@@ -1,16 +1,14 @@
 package com.example.demo.web;
 
+import com.example.demo.payload.request.CreateFinanceMonthPlanRequest;
 import com.example.demo.payload.request.CreateFinanceRecordRequest;
-import com.example.demo.payload.request.LoginRequest;
 import com.example.demo.payload.response.CreateFinanceRecordSuccessResponse;
-import com.example.demo.security.JWTTokenProvider;
-import com.example.demo.services.FinanceRecordService;
+import com.example.demo.services.FinanceMonthPlanService;
 import com.example.demo.services.UserService;
 import com.example.demo.validations.ResponseErrorValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -20,34 +18,35 @@ import java.security.Principal;
 
 @CrossOrigin
 @RestController
-@RequestMapping("/api/FinanceRecord")
+@RequestMapping("/api/FinanceMonthPlan")
 @PreAuthorize("permitAll()")
-public class FinanceRecordController {
+public class FinanceMonthPlanController {
 
     @Autowired
     private ResponseErrorValidation responseErrorValidation;
     @Autowired
     private UserService userService;
     @Autowired
-    private FinanceRecordService financeRecordService;
+    private FinanceMonthPlanService financeMonthPlanService;
 
     @PostMapping("/create")
-    public ResponseEntity<Object> create(@Valid @RequestBody CreateFinanceRecordRequest createFinanceRecordRequest, BindingResult bindingResult, Principal principal){
+    public ResponseEntity<Object> create(@Valid @RequestBody CreateFinanceMonthPlanRequest createFinanceMonthPlanRequest, BindingResult bindingResult, Principal principal){
         var errors = responseErrorValidation.mapValidationService(bindingResult);
         if (!ObjectUtils.isEmpty(errors)) return errors;
 
-        financeRecordService.createFinanceRecord(createFinanceRecordRequest, principal);
+        financeMonthPlanService.createFinancePlan(createFinanceMonthPlanRequest, principal);
         return ResponseEntity.ok(new CreateFinanceRecordSuccessResponse(true));
     }
 
     @GetMapping("/getAllByUser")
     public ResponseEntity<Object> getAllByUser(Principal principal){
-        return ResponseEntity.ok(financeRecordService.getAllFinanceRecordsByUser(principal));
+
+        return ResponseEntity.ok(financeMonthPlanService.getAllFinancePlanByUser(principal));
     }
 
     @GetMapping("/getLastMonthByUser")
     public ResponseEntity<Object> getLastMonthByUser(Principal principal){
-        return ResponseEntity.ok(financeRecordService.getAllFinanceRecordsByUserLastMonth(principal));
-    }
 
+        return ResponseEntity.ok(financeMonthPlanService.getAllFinancePlanByUserLastMonth(principal));
+    }
 }

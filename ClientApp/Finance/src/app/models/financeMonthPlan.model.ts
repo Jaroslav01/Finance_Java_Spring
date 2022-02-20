@@ -1,9 +1,9 @@
 import {User} from "./user.model";
 
-export interface FinanceRecord{
+export interface FinanceMonthPlan{
   id: number;
   amount: number;
+  updatedDate: number;
   createdDate: number;
-  type: number;
-  user: User;
+  user: User
 }

@@ -4,8 +4,11 @@ import com.example.demo.dto.UserDTO;
 import com.example.demo.entity.User;
 import com.example.demo.entity.enums.ERole;
 import com.example.demo.exceptions.UserExistException;
+import com.example.demo.payload.request.CreateFinanceMonthPlanRequest;
+import com.example.demo.payload.request.CreateFinanceRecordRequest;
 import com.example.demo.payload.request.SignupRequest;
 import com.example.demo.repository.UserRepository;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +24,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final MailgunService mailgunService;
+    private final FinanceRecordService financeRecordService;
+    private final FinanceMonthPlanService financeMonthPlanService;
 
     @Autowired
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder, MailgunService mailgunService1, FinanceRecordService financeRecordService, FinanceMonthPlanService financeMonthPlanService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.mailgunService = mailgunService1;
+        this.financeRecordService = financeRecordService;
+        this.financeMonthPlanService = financeMonthPlanService;
     }
 
     private User getUserByPrincipal(Principal principal){
@@ -48,12 +57,27 @@ public class UserService {
         user.getRole().add(ERole.ROLE_USER);
 
         try {
+            mailgunService.sendSimpleMessage(user.getEmail());
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+
+        try {
             LOG.info("Saving User {}", userIn.getEmail());
-            return userRepository.save(user);
+            user = userRepository.save(user);
         } catch (Exception ex){
             LOG.error("Error during registration. {}", ex.getMessage());
             throw new UserExistException("The user " + user.getUsername() + " already exist. Please check credentionals");
         }
+
+        var createFinanceMonthPlanRequest = new CreateFinanceMonthPlanRequest();
+        createFinanceMonthPlanRequest.setAmount(100L);
+        financeMonthPlanService.createFinancePlan(createFinanceMonthPlanRequest, user);
+
+        var createFinanceRecordRequest = new CreateFinanceRecordRequest();
+        createFinanceRecordRequest.setAmount(0L);
+        createFinanceRecordRequest.setType(0);
+        return user;
     }
 
     public User updateUser(UserDTO userDTO, Principal principal){
